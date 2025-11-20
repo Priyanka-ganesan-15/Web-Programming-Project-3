@@ -13,7 +13,7 @@
 import mongoose from "mongoose";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import bluebird from "bluebird";
-import models from "./project2/modelData/photoApp.js";
+import models from "./modelData/photoApp.js";
 
 // Load the Mongoose schema for Use and Photo
 import User from "./schema/user.js";
@@ -22,7 +22,7 @@ import SchemaInfo from "./schema/schemaInfo.js";
 
 mongoose.Promise = bluebird;
 mongoose.set("strictQuery", false);
-mongoose.connect("mongodb://127.0.0.1/project2", {
+mongoose.connect("mongodb://127.0.0.1/project3", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -50,6 +50,8 @@ Promise.all(removePromises)
         location: user.location,
         description: user.description,
         occupation: user.occupation,
+        login_name: user.last_name.toLowerCase(),
+        password: "weak",
       })
         .then(function (userObj) {
           // Set the unique ID of the object. We use the MongoDB generated _id
