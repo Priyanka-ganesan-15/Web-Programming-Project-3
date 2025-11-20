@@ -1,0 +1,259 @@
+/**
+ * Project 2 Express server connected to MongoDB 'project2'.
+ * Start with: node webServer.js
+ * Client uses axios to call these endpoints.
+ */
+
+// eslint-disable-next-line import/no-extraneous-dependencies
+import mongoose from "mongoose";
+// eslint-disable-next-line import/no-extraneous-dependencies
+import bluebird from "bluebird";
+import express from "express";
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+// ToDO - Your submission should work without this line. Comment out or delete this line for tests and before submission!
+// import models from "./project2/modelData/photoApp.js";
+
+// Load the Mongoose schema for User, Photo, and SchemaInfo
+import User from "./schema/user.js";
+import Photo from "./schema/photo.js";
+import SchemaInfo from "./schema/schemaInfo.js";
+
+const portno = 3001; // Port number to use
+const app = express();
+
+// Enable CORS for all routes
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(200);
+  } else {
+    next();
+  }
+});
+
+mongoose.Promise = bluebird;
+mongoose.set("strictQuery", false);
+
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/project2";
+mongoose.connect(MONGODB_URI, { dbName: "project2" })
+  .then(() => console.log("MongoDB connected"))
+  .catch(err => console.error("MongoDB connect error:", err));
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// We have the express static module
+// (http://expressjs.com/en/starter/static-files.html) do all the work for us.
+app.use(express.static(__dirname));
+
+app.get("/", function (request, response) {
+  response.send("Simple web server of files from " + __dirname);
+});
+
+/**
+ * /test/info - Returns the SchemaInfo object of the database in JSON format.
+ *              This is good for testing connectivity with MongoDB.
+ */
+
+app.get("/test/info", async (req, res) => {
+  try {
+    const info = await SchemaInfo.findOne({}, { __v: 0 }).lean();
+    if (!info) {
+      return res.status(404).send({ message: "No schema info." });
+    }
+    return res.status(200).send(info);
+  } catch (err) {
+    return res.status(500).send({ message: "Server error", error: String(err) });
+  }
+});
+
+/**
+ * /test/counts - Returns an object with the counts of the different collections
+ *                in JSON format.
+ */
+app.get("/test/counts", async (req, res) => {
+  try {
+    const [userCount, photoCount, schemaCount] = await Promise.all([
+      User.countDocuments({}),
+      Photo.countDocuments({}),
+      SchemaInfo.countDocuments({})
+    ]);
+    return res.status(200).send({ user: userCount, photo: photoCount, schemaInfo: schemaCount });
+  } catch (err) {
+    return res.status(500).send({ message: "Server error", error: String(err) });
+  }
+});
+
+/**
+ * URL /user/list - Returns all the User objects.
+ */
+app.get("/user/list", async (req, res) => {
+  try {
+    const users = await User.find({}, { _id: 1, first_name: 1, last_name: 1 }).lean();
+    return res.status(200).send(users);
+  } catch (err) {
+    return res.status(500).send({ message: "Server error", error: String(err) });
+  }
+});
+
+/**
+ * URL /user/:id - Returns the information for User (id).
+ */
+app.get("/user/:id", async (req, res) => {
+  try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).send({ message: "Bad user id format" });
+    }
+    const user = await User.findById(req.params.id, { _id: 1, first_name: 1, last_name: 1, location: 1, description: 1, occupation: 1 }).lean();
+    if (!user) {
+      return res.status(400).send({ message: "No such user id" });
+    }
+    return res.status(200).send(user);
+  } catch (err) {
+    return res.status(500).send({ message: "Server error", error: String(err) });
+  }
+});
+
+/**
+ * URL /photosOfUser/:id - Returns the Photos for User (id).
+ */
+app.get("/photosOfUser/:id", async (req, res) => {
+  try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).send({ message: "Bad user id format" });
+    }
+
+    // Find all photos for the user
+    const photos = await Photo.find(
+      { user_id: req.params.id },
+      { _id: 1, user_id: 1, file_name: 1, date_time: 1, comments: 1 }
+    ).lean();
+
+    if (!photos || photos.length === 0) {
+      return res.status(200).send([]);
+    }
+
+    // Gather all distinct comment.user_id values
+    const commentUserIds = new Set();
+    photos.forEach((photo) => {
+      if (photo.comments && Array.isArray(photo.comments)) {
+        photo.comments.forEach((comment) => {
+          if (comment.user_id) {
+            commentUserIds.add(comment.user_id.toString());
+          }
+        });
+      }
+    });
+
+    // Fetch those users with specific fields
+    const commentUsers = await User.find(
+      { _id: { $in: Array.from(commentUserIds) } },
+      { _id: 1, first_name: 1, last_name: 1 }
+    ).lean();
+
+    // Create a map for quick user lookup
+    const userMap = {};
+    commentUsers.forEach((user) => {
+      userMap[user._id.toString()] = user;
+    });
+
+    // Build the response with enriched comments
+    const result = photos.map((photo) => {
+      const enrichedPhoto = { ...photo };
+      if (photo.comments && Array.isArray(photo.comments)) {
+        enrichedPhoto.comments = photo.comments.map((comment) => ({
+          _id: comment._id,
+          comment: comment.comment,
+          date_time: comment.date_time,
+          user: userMap[comment.user_id.toString()] || null
+        }));
+      }
+      return enrichedPhoto;
+    });
+
+    return res.status(200).send(result);
+  } catch (err) {
+    return res.status(500).send({ message: "Server error", error: String(err) });
+  }
+});
+
+/**
+ * URL /user/:id/stats - Returns statistics for a user.
+ * Returns { photoCount: number, commentCount: number }
+ */
+app.get("/user/:id/stats", async (req, res) => {
+  try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).send({ message: "Bad user id format" });
+    }
+
+    const userId = req.params.id;
+
+    // Count photos by this user
+    const photoCount = await Photo.countDocuments({ user_id: userId });
+
+    // Count comments by this user using aggregation pipeline
+    const commentResults = await Photo.aggregate([
+      { $unwind: "$comments" },
+      { $match: { "comments.user_id": new mongoose.Types.ObjectId(userId) } },
+      { $count: "total" }
+    ]);
+
+    const commentCount = commentResults.length > 0 ? commentResults[0].total : 0;
+
+    return res.status(200).send({
+      photoCount,
+      commentCount,
+    });
+  } catch (err) {
+    return res.status(500).send({ message: "Server error", error: String(err) });
+  }
+});
+
+/**
+ * URL /commentsOfUser/:id - Returns all comments authored by a user.
+ * Returns an array of { photo_id, photo_file_name, photo_owner_id, comment_id, comment, date_time }
+ */
+app.get("/commentsOfUser/:id", async (req, res) => {
+  try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).send({ message: "Bad user id format" });
+    }
+
+    const userId = req.params.id;
+
+    const comments = await Photo.aggregate([
+      { $unwind: "$comments" },
+      { $match: { "comments.user_id": new mongoose.Types.ObjectId(userId) } },
+      {
+        $project: {
+          photo_id: "$_id",
+          photo_file_name: "$file_name",
+          photo_owner_id: "$user_id",
+          comment_id: "$comments._id",
+          comment: "$comments.comment",
+          date_time: "$comments.date_time",
+          _id: 0,
+        },
+      },
+    ]);
+
+    return res.status(200).send(comments);
+  } catch (err) {
+    return res.status(500).send({ message: "Server error", error: String(err) });
+  }
+});
+
+const server = app.listen(portno, function () {
+  const port = server.address().port;
+  console.log(
+    "Listening at http://localhost:" +
+      port +
+      " exporting the directory " +
+      __dirname
+  );
+});
