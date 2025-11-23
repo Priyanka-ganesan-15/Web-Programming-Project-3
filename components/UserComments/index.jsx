@@ -1,16 +1,22 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {useParams} from 'react-router-dom';
 import {
     Alert, Box, Typography, Skeleton,
 } from '@mui/material';
-import {useFeatureFlags} from '../../src/context/FeatureFlagsContext';
 import {fetchUserComments} from "../../api.js";
 import CommentItem from './comment';
+import appStore from "../../src/context/appStore.js";
 
 function UserComments() {
     const {userId} = useParams();
-    const {advanced} = useFeatureFlags();
+    const advanced = appStore((s) => s.advanced);
     const {data: comments = [], isLoading, error} = fetchUserComments(userId);
+
+    const setPage = appStore((s) => s.setPage);
+
+    useEffect(() => {
+        setPage('Comments');
+    },[]);
 
     if (!advanced) {
         return (

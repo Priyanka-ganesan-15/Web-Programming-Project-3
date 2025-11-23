@@ -7,12 +7,10 @@ import {
 } from "@mui/material";
 import "./styles.css";
 import "./bubbles.css";
-import { useFeatureFlags } from "../../src/context/FeatureFlagsContext";
 import User from "./user.jsx";
 import { fetchUsers } from "../../api";
 
 function UserList() {
-    const { advanced } = useFeatureFlags();
     const { data: userList = [], isLoading, error } = fetchUsers();
 
     return (
@@ -34,7 +32,6 @@ function UserList() {
                     {userList.map((user) => (
                         <User
                             user={user}
-                            advanced={advanced}
                             key={user._id}
                         />
                     ))}

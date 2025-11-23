@@ -2,10 +2,12 @@ import React from "react";
 import { Box, Divider, ListItemButton, ListItemText, Skeleton } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { fetchUserStats } from "../../api";
+import appStore from "../../src/context/appStore.js";
 
-function User({ user, advanced }) {
+function User({ user }) {
     const { data: userStats, isLoading: isLoadingStats } = fetchUserStats(user._id);
     const navigate = useNavigate();
+    const advanced = appStore((s) => s.advanced);
 
     return (
         <>
