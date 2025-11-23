@@ -1,7 +1,7 @@
 import React, {useEffect} from "react";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import ReactDOM from "react-dom/client";
-import {Grid, Paper} from "@mui/material";
+import {Grid, Paper, Typography} from "@mui/material";
 import {BrowserRouter, Route, Routes, useParams} from "react-router-dom";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 
@@ -12,6 +12,7 @@ import UserList from "./components/UserList";
 import UserPhotos from "./components/UserPhotos";
 import UserComments from "./components/UserComments";
 import appStore from "./src/context/appStore.js";
+import LoginRegister from "./components/LoginRegister/index.jsx";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,8 @@ function UserPhotosRoute() {
 
 function PhotoShare() {
 
+    const user = appStore((s) => s.loggedInUser);
+
     const load = appStore((s) => s.load);
     useEffect(() => {
         load();
@@ -48,25 +51,29 @@ function PhotoShare() {
                     <div className="main-topbar-buffer"/>
                     <Grid item sm={3}>
                         <Paper className="main-grid-item">
-                            <UserList/>
+                            {user ? <UserList/> : <Typography>please log in to view</Typography>}
                         </Paper>
                     </Grid>
                     <Grid item sm={9}>
                         <Paper className="main-grid-item">
-                            <Routes>
-                                {/* Homepage route intentionally left blank per project instructions */}
-                                <Route
-                                    path="/users/:userId/comments"
-                                    element={<UserCommentsRoute/>}
-                                />
-                                <Route path="/users/:userId" element={<UserDetailRoute/>}/>
-                                <Route path="/photos/:userId" element={<UserPhotosRoute/>}/>
-                                <Route
-                                    path="/photos/:userId/:photoId"
-                                    element={<UserPhotosRoute/>}
-                                />
-                                <Route path="/users" element={<UserList/>}/>
-                            </Routes>
+                            {user ? (
+                                <Routes>
+                                    {/* Homepage route intentionally left blank per project instructions */}
+                                    <Route
+                                        path="/users/:userId/comments"
+                                        element={<UserCommentsRoute/>}
+                                    />
+                                    <Route path="/users/:userId" element={<UserDetailRoute/>}/>
+                                    <Route path="/photos/:userId" element={<UserPhotosRoute/>}/>
+                                    <Route
+                                        path="/photos/:userId/:photoId"
+                                        element={<UserPhotosRoute/>}
+                                    />
+                                    <Route path="/users" element={<UserList/>}/>
+                                </Routes>
+                            ) : (
+                                <LoginRegister/>
+                            )}
                         </Paper>
                     </Grid>
                 </Grid>

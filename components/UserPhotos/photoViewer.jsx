@@ -15,6 +15,7 @@ import {formatDate} from "./photoHelpers.js";
 
 
 function PhotoViewer({ photo, currentIndex, totalPhotos, userId, stepper }) {
+
     return (
         <Stack spacing={2} sx={{ p: 1 }}>
             <Button component={RouterLink} to={`/users/${userId}`} variant="text">

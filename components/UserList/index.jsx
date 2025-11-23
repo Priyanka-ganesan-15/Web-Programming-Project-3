@@ -8,11 +8,10 @@ import {
 import "./styles.css";
 import "./bubbles.css";
 import User from "./user.jsx";
-import { fetchUsers } from "../../api";
+import {fetchUsers} from "../../api";
 
 function UserList() {
-    const { data: userList = [], isLoading, error } = fetchUsers();
-
+    const {data: userList = [], isLoading, error} = fetchUsers();
     return (
         <Box>
             <Typography variant="h6" gutterBottom>
@@ -40,4 +39,5 @@ function UserList() {
         </Box>
     );
 }
+
 export default UserList;

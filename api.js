@@ -1,5 +1,5 @@
 import axios from "axios";
-import {useQuery} from '@tanstack/react-query';
+import {useMutation, useQuery} from '@tanstack/react-query';
 
 const api = axios.create({
     baseURL: "http://localhost:3001",
@@ -9,7 +9,7 @@ export const fetchUsers = () => {
     return useQuery({
         queryKey: ['users'],
         queryFn: async () => {
-            const res = await api.get("/user/list");
+            const res = await api.get("/user/list", {withCredentials: true});
             return res.data;
         },
     });
@@ -19,7 +19,7 @@ export const fetchUserStats = (userId) => {
     return useQuery({
         queryKey: ['users', userId, 'stats'],
         queryFn: async () => {
-            const res = await api.get(`/user/${userId}/stats`);
+            const res = await api.get(`/user/${userId}/stats`, {withCredentials: true});
             return res.data;
         },
     });
@@ -29,7 +29,7 @@ export const fetchUserDetails = (userId) => {
     return useQuery({
         queryKey: ['users', userId, 'Details'],
         queryFn: async () => {
-            const res = await api.get(`/user/${userId}`);
+            const res = await api.get(`/user/${userId}`, {withCredentials: true});
             return res.data;
         },
     });
@@ -39,7 +39,7 @@ export const fetchUserComments = (userId) => {
     return useQuery({
         queryKey: ['users', userId, 'Comments'],
         queryFn: async () => {
-            const res = await api.get(`/commentsOfUser/${userId}`);
+            const res = await api.get(`/commentsOfUser/${userId}`, {withCredentials: true});
             return res.data;
         },
     });
@@ -49,15 +49,30 @@ export const getPhotos = (userId) => {
     return useQuery({
         queryKey: ['users', userId, 'Photos'],
         queryFn: async () => {
-            const res = await api.get(`/photosOfUser/${userId}`);
+            const res = await api.get(`/photosOfUser/${userId}`, {withCredentials: true});
             return res.data;
         },
     });
 };
 
-//used in top bar for some reason, best not to question the methodology...
-export const fetchRoot = async () => {
-    return axios.get('/');
+
+export const postLogin = () => {
+    return useMutation({
+        mutationFn: async (loginName) => {
+            console.log(loginName);
+            const res = await api.post('/admin/login', {login_name: loginName}, {withCredentials: true});
+            return res.data; // expected: user object
+        },
+    });
+};
+
+export const postLogout = () => {
+    return useMutation({
+        mutationFn: async () => {
+            const res = await api.post('/admin/logout', {}, {withCredentials: true});
+            return res.data; // expected: user object
+        },
+    });
 };
 
 
