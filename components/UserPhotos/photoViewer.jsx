@@ -11,24 +11,8 @@ import {
     Button,
 } from '@mui/material';
 import PhotoComments from "./photoComments.jsx";
+import {formatDate} from "./photoHelpers.js";
 
-// Helper: format date safely
-export const formatDate = (dateStr) => {
-    try {
-        const d = new Date(dateStr);
-        return d.toLocaleString();
-    } catch (e) {
-        return dateStr;
-    }
-};
-
-// Helper: commenter initials for Avatar
-export const initials = (user) => {
-    if (!user) return '?';
-    const first = user.first_name || '';
-    const last = user.last_name || '';
-    return `${first.charAt(0)}${last.charAt(0)}`.toUpperCase();
-};
 
 function PhotoViewer({ photo, currentIndex, totalPhotos, userId, stepper }) {
     return (

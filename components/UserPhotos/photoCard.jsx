@@ -1,4 +1,3 @@
-// PhotoCard.jsx
 import React from 'react';
 import {
     Card,
@@ -9,8 +8,8 @@ import {
     Stack,
     Box,
 } from '@mui/material';
-import {formatDate} from "./photoViewer.jsx";
-import PhotoComments from "./photoComments.jsx";
+import {formatDate} from "./photoHelpers";
+import PhotoComments from "./photoComments";
 
 function PhotoCard({ photo }) {
     return (

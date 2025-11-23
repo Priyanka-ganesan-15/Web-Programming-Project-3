@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { Box, Stack, Avatar, Typography, Link } from '@mui/material';
-import { formatDate, initials } from './photoViewer.jsx';
+import { formatDate, initials } from './photoHelpers';
 
 function PhotoComments({ comments }) {
     if (!comments || comments.length === 0) {
