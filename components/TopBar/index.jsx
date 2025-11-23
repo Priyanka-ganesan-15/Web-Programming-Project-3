@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import axios from 'axios';
 import { AppBar, Toolbar, Typography, Box } from '@mui/material';
 
 import './styles.css';
 import { useFeatureFlags } from '../../src/context/FeatureFlagsContext';
+import {fetchRoot} from "../../api.js";
 
 // Toggle this to true to hit the running Express server on localhost:3001
 const USE_SERVER = false;
@@ -52,7 +52,7 @@ function TopBar() {
       setLoading(true);
       const url = `${BASE}/user/${userId}`;
 
-      axios.get(url)
+      fetchRoot() // TODO does this actually serve a purpose?
         .then((response) => {
           if (!mounted) return;
           const data = response.data || null;

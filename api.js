@@ -22,8 +22,11 @@ export const fetchUserDetails = async (userId) => {
 export const fetchUserComments = async (userId) => {
     console.log(`/commentsOfUser/${userId}`);
     const res = await api.get(`/commentsOfUser/${userId}`);
-    console.log('res',res);
     return res.data;
+}
+
+export const fetchRoot = async()=>{
+    return await axios.get('/');
 }
 
 export default api;

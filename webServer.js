@@ -219,6 +219,8 @@ app.get("/user/:id/stats", async (req, res) => {
  * Returns an array of { photo_id, photo_file_name, photo_owner_id, comment_id, comment, date_time }
  */
 app.get("/commentsOfUser/:id", async (req, res) => {
+  console.log('hi')
+
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).send({ message: "Bad user id format" });

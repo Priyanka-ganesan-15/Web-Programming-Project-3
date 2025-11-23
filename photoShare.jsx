@@ -15,6 +15,11 @@ import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
 
+function UserCommentsRoute(){
+    const {userId} = useParams();
+    return <UserComments userId={userId}/>
+}
+
 function UserDetailRoute() {
     const {userId} = useParams();
     // eslint-disable-next-line no-console
@@ -47,7 +52,7 @@ function PhotoShare() {
                                 {/* Homepage route intentionally left blank per project instructions */}
                                 <Route
                                     path="/users/:userId/comments"
-                                    element={<UserComments/>}
+                                    element={<UserCommentsRoute/>}
                                 />
                                 <Route path="/users/:userId" element={<UserDetailRoute/>}/>
                                 <Route path="/photos/:userId" element={<UserPhotosRoute/>}/>
