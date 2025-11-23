@@ -318,6 +318,36 @@ app.post("/admin/logout", async (req, res) => {
     }
 });
 
+app.post('/commentsOfPhoto/:photo_id', requireLogin, async (req, res) => {
+    try {
+        const photoId = req.params.photo_id;
+        const { content } = req.body;
+
+        if (!content || content.trim() === "") {
+            return res.status(400).json({ error: "Comment content is required" });
+        }
+
+        const photo = await Photo.findById(photoId);
+        if (!photo) {
+            return res.status(404).json({ error: "Photo not found" });
+        }
+
+        const newComment = {
+            comment: content,
+            user_id: req.session.loggedInUser._id,
+            date_time: new Date()
+        };
+
+        photo.comments.push(newComment);
+
+        await photo.save();
+        return res.status(200).json({ message: "Comment added", photo });
+    } catch (e) {
+        console.error("Error adding comment:", e);
+        return res.status(500).json({ error: "Server error" });
+    }
+});
+
 const server = app.listen(portno, function () {
     const port = server.address().port;
     console.log(
