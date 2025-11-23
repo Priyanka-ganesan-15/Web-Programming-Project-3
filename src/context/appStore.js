@@ -5,16 +5,31 @@ const appStore = create((set) => ({
     advanced: false,
     isLoaded: false,
     load: () => {
-        const stored = localStorage.getItem("featureFlags");
-        if (stored) {
+        // --- Load feature flags ----
+        const storedFlags = localStorage.getItem("featureFlags");
+        if (storedFlags) {
             try {
-                const flags = JSON.parse(stored);
-                set({advanced: !!flags.advanced, isLoaded: true});
-                return;
+                const flags = JSON.parse(storedFlags);
+                set({
+                    advanced: !!flags.advanced,
+                });
             } catch (err) {
                 console.warn("Failed to parse stored feature flags:", err);
             }
         }
+
+        // --- Load logged-in user ----
+        const storedUser = localStorage.getItem("loggedInUser");
+        if (storedUser) {
+            try {
+                const user = JSON.parse(storedUser);
+                set({loggedInUser: user});
+            } catch (err) {
+                console.warn("Failed to parse loggedInUser:", err);
+            }
+        }
+
+        // Mark store as fully loaded
         set({isLoaded: true});
     },
 
@@ -25,21 +40,31 @@ const appStore = create((set) => ({
         });
     },
 
-    userName: 'Pariyanker Ganeseeley',
-    setUserName: (value) => { // well use this later
-        set(() => ({
-            userName: value,
-        }));
+    loggedInUser: null,
+    setLoggedInUser: (user) => {
+        set(() => {
+            if (user) {
+                localStorage.setItem("loggedInUser", JSON.stringify(user));
+            }
+            return {loggedInUser: user};
+        });
+    },
+    logoutUser: () => {
+        set(() => {
+            console.log('called');
+            localStorage.removeItem("loggedInUser");
+            return {loggedInUser: null};
+        });
     },
 
-    page:'Users',
+    page: 'Users',
     setPage: (value) => {
         set(() => ({
             page: value,
         }));
     },
 
-    photoIndex:-1,
+    photoIndex: -1,
     setPhotoIndex: (value) => {
         set(() => ({
             photoIndex: value,

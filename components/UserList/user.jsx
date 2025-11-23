@@ -1,11 +1,11 @@
 import React from "react";
-import { Box, Divider, ListItemButton, ListItemText, Skeleton } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
-import { fetchUserStats } from "../../api";
+import {Box, Divider, ListItemButton, ListItemText, Skeleton} from "@mui/material";
+import {Link, useNavigate} from "react-router-dom";
+import {fetchUserStats} from "../../api";
 import appStore from "../../src/context/appStore.js";
 
-function User({ user }) {
-    const { data: userStats, isLoading: isLoadingStats } = fetchUserStats(user._id);
+function User({user}) {
+    const {data: userStats, isLoading: isLoadingStats} = fetchUserStats(user._id);
     const navigate = useNavigate();
     const advanced = appStore((s) => s.advanced);
 
@@ -14,16 +14,16 @@ function User({ user }) {
             <ListItemButton
                 component={Link}
                 to={`/users/${user._id}`}
-                sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}
             >
-                <ListItemText primary={`${user.first_name} ${user.last_name}`} />
+                <ListItemText primary={`${user.first_name} ${user.last_name}`}/>
 
                 {advanced && (
-                    <Box sx={{ display: 'flex', gap: 0.5, ml: 1 }}>
+                    <Box sx={{display: 'flex', gap: 0.5, ml: 1}}>
                         {isLoadingStats ? (
                             <>
-                                <Skeleton variant="circular" width={24} height={24} />
-                                <Skeleton variant="circular" width={24} height={24} />
+                                <Skeleton variant="circular" width={24} height={24}/>
+                                <Skeleton variant="circular" width={24} height={24}/>
                             </>
                         ) : userStats ? (
                             <>
@@ -52,8 +52,9 @@ function User({ user }) {
                     </Box>
                 )}
             </ListItemButton>
-            <Divider />
+            <Divider/>
         </>
+
     );
 }
 
