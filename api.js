@@ -75,5 +75,14 @@ export const postLogout = () => {
     });
 };
 
+export const postComment = () => {
+    return useMutation({
+        mutationFn: async ({photoId, commentContent}) => {
+            const res = await api.post(`/commentsOfPhoto/${photoId}`, {comment: commentContent}, {withCredentials: true});
+            return res.data;
+        },
+    });
+};
+
 
 export default api;
