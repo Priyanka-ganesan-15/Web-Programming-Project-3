@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import ReactDOM from "react-dom/client";
 import {Grid, Paper} from "@mui/material";
@@ -11,12 +11,11 @@ import UserDetail from "./components/UserDetail";
 import UserList from "./components/UserList";
 import UserPhotos from "./components/UserPhotos";
 import UserComments from "./components/UserComments";
-import {FeatureFlagsProvider} from "./src/context/FeatureFlagsContext";
-
+import appStore from "./src/context/appStore.js";
 
 const queryClient = new QueryClient();
 
-function UserCommentsRoute(){
+function UserCommentsRoute() {
     const {userId} = useParams();
     return <UserComments userId={userId}/>;
 }
@@ -33,6 +32,12 @@ function UserPhotosRoute() {
 }
 
 function PhotoShare() {
+
+    const load = appStore((s) => s.load);
+    useEffect(() => {
+        load();
+    }, []);
+
     return (
         <BrowserRouter>
             <div>
@@ -72,9 +77,7 @@ function PhotoShare() {
 
 const root = ReactDOM.createRoot(document.getElementById("photoshareapp"));
 root.render(
-    <FeatureFlagsProvider>
-        <QueryClientProvider client={queryClient}>
-            <PhotoShare/>
-        </QueryClientProvider>
-    </FeatureFlagsProvider>,
+    <QueryClientProvider client={queryClient}>
+        <PhotoShare/>
+    </QueryClientProvider>
 );

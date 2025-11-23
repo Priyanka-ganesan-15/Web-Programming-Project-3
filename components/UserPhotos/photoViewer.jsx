@@ -1,4 +1,3 @@
-// PhotoViewer.jsx
 import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import {
@@ -9,10 +8,9 @@ import {
     Divider,
     Stack,
     Box,
-    Avatar,
     Button,
-    Link,
 } from '@mui/material';
+import PhotoComments from "./photoComments.jsx";
 
 // Helper: format date safely
 export const formatDate = (dateStr) => {
@@ -29,32 +27,15 @@ export const initials = (user) => {
     if (!user) return '?';
     const first = user.first_name || '';
     const last = user.last_name || '';
-    const f = first.charAt(0) || '';
-    const l = last.charAt(0) || '';
-    return `${f}${l}`.toUpperCase();
+    return `${first.charAt(0)}${last.charAt(0)}`.toUpperCase();
 };
 
-function PhotoViewer({
-                         photo,
-                         currentIndex,
-                         totalPhotos,
-                         userId,
-                         photoNotFound,
-                         stepper,
-                     }) {
+function PhotoViewer({ photo, currentIndex, totalPhotos, userId, stepper }) {
     return (
         <Stack spacing={2} sx={{ p: 1 }}>
             <Button component={RouterLink} to={`/users/${userId}`} variant="text">
                 Back to user
             </Button>
-
-            {photoNotFound && (
-                <Box sx={{ p: 1, backgroundColor: '#fff3cd', borderRadius: 1, border: '1px solid #ffc107' }}>
-                    <Typography variant="body2" sx={{ color: '#856404' }}>
-                        Photo not found, showing first photo
-                    </Typography>
-                </Box>
-            )}
 
             <Card>
                 {photo.file_name && (
@@ -80,14 +61,14 @@ function PhotoViewer({
                         <Stack direction="row" spacing={1}>
                             <Button
                                 variant="outlined"
-                                onClick={()=>stepper(-1)}
+                                onClick={() => stepper(-1)}
                                 disabled={currentIndex === 0}
                             >
                                 Prev
                             </Button>
                             <Button
                                 variant="outlined"
-                                onClick={()=>stepper(1)}
+                                onClick={() => stepper(1)}
                                 disabled={currentIndex === totalPhotos - 1}
                             >
                                 Next
@@ -98,42 +79,7 @@ function PhotoViewer({
 
                         <Box>
                             <Typography variant="subtitle2">Comments</Typography>
-
-                            {!photo.comments || photo.comments.length === 0 ? (
-                                <Typography variant="body2">No comments yet.</Typography>
-                            ) : (
-                                <Stack spacing={2} sx={{ mt: 1 }}>
-                                    {photo.comments.map((comment) => (
-                                        <Box key={comment._id} sx={{ display: 'flex', gap: 1 }}>
-                                            <Avatar sx={{ width: 36, height: 36, fontSize: 12 }}>
-                                                {initials(comment.user)}
-                                            </Avatar>
-                                            <Box>
-                                                <Stack direction="row" spacing={1} alignItems="center">
-                                                    <Link
-                                                        component={RouterLink}
-                                                        to={`/users/${comment.user._id}`}
-                                                        underline="hover"
-                                                    >
-                                                        <Typography
-                                                            variant="body2"
-                                                            fontWeight={600}
-                                                            component="span"
-                                                        >
-                                                            {`${comment.user.first_name} ${comment.user.last_name}`}
-                                                        </Typography>
-                                                    </Link>
-                                                    <Typography variant="caption" color="text.secondary">
-                                                        {formatDate(comment.date_time)}
-                                                    </Typography>
-                                                </Stack>
-
-                                                <Typography variant="body2">{comment.comment}</Typography>
-                                            </Box>
-                                        </Box>
-                                    ))}
-                                </Stack>
-                            )}
+                            <PhotoComments comments={photo.comments} />
                         </Box>
                     </Stack>
                 </CardContent>

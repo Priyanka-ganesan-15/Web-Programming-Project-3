@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useCallback, useEffect} from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import {
     Card,
@@ -11,9 +11,15 @@ import {
 } from '@mui/material';
 import { fetchUserDetails } from "../../api";
 import './styles.css';
+import appStore from "../../src/context/appStore.js";
 
 function UserDetail({ userId }) {
     const { data: user, isLoading, error } = fetchUserDetails(userId);
+
+    const setPage = appStore((s) => s.setPage);
+    useEffect(() => {
+        setPage('Details');
+    },[]);
 
     if (isLoading) {
         return (

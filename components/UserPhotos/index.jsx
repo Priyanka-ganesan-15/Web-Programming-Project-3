@@ -1,119 +1,124 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useParams, Link as RouterLink, useNavigate } from 'react-router-dom';
 import {
-  Typography,
-  Stack,
-  Box,
-  Button,
-  CircularProgress,
+    Typography,
+    Stack,
+    Box,
+    Button,
+    CircularProgress,
 } from '@mui/material';
 
 import './styles.css';
-import { useFeatureFlags } from '../../src/context/FeatureFlagsContext';
 import { getPhotos } from "../../api.js";
 import PhotoCard from './photoCard';
 import PhotoViewer from './photoViewer';
+import appStore from "../../src/context/appStore.js";
 
 function UserPhotos() {
-  const { userId, photoId } = useParams();
-  const navigate = useNavigate();
-  const { advanced } = useFeatureFlags();
+    const { userId, photoId } = useParams();
+    const navigate = useNavigate();
 
-  const { data: photos = [], isLoading, error } = getPhotos(userId);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [photoNotFound, setPhotoNotFound] = useState(false);
+    const advanced = appStore((s) => s.advanced);
+    const setPage = appStore((s) => s.setPage);
+    const photoIndex = appStore((s) => s.photoIndex);
+    const setPhotoIndex = appStore((s) => s.setPhotoIndex);
 
-  // Handle advanced mode: navigate to first photo if needed
-  useEffect(() => {
-    if (advanced && photos.length > 0 && !photoId) {
-      navigate(`/photos/${userId}/${photos[0]._id}`, { replace: true });
+    const { data: photos = [], isLoading, error } = getPhotos(userId);
+
+    // Handle advanced mode: navigate to first photo if needed
+    useEffect(() => {
+        if (advanced && photos.length > 0 && !photoId) {
+            navigate(`/photos/${userId}/${photos[0]._id}`, { replace: true });
+        }
+    }, [advanced, photos, photoId, userId, navigate]);
+
+    // Update current index when photoId changes
+    useEffect(() => {
+        setPage('Photos');
+        if (photoId && photos.length > 0) {
+            const idx = photos.findIndex((p) => p._id === photoId);
+            setPhotoIndex(idx); // -1 if not found
+        } else {
+            setPhotoIndex(-1);
+        }
+    }, [photoId, photos, setPage]);
+
+    // Photo stepper
+    const handleNavigate = (direction) => {
+        const newIndex = photoIndex + direction;
+        if (newIndex < 0 || newIndex >= photos.length) return;
+
+        const nextPhoto = photos[newIndex];
+        navigate(`/photos/${userId}/${nextPhoto._id}`, { replace: false });
+    };
+
+    if (isLoading) {
+        return (
+            <Box display="flex" alignItems="center" justifyContent="center" p={2}>
+                <Stack direction="row" spacing={2} alignItems="center">
+                    <CircularProgress size={20} />
+                    <Typography variant="body2">Loading photos…</Typography>
+                </Stack>
+            </Box>
+        );
     }
-  }, [advanced, photos, photoId, userId, navigate]);
 
-  // Update current index when photoId changes
-  useEffect(() => {
-    if (photoId && photos.length > 0) {
-      const phot = photos.findIndex((p) => p._id === photoId);
-      if (phot !== -1) {
-        setCurrentIndex(phot);
-        setPhotoNotFound(false);
-      } else {
-        setCurrentIndex(0);
-        setPhotoNotFound(true);
-      }
-    } else if (!photoId) {
-      setPhotoNotFound(false);
+    if (error) {
+        return (
+            <Box p={2}>
+                <Typography color="error" variant="body2">Error: {error.message}</Typography>
+            </Box>
+        );
     }
-  }, [photoId, photos]);
 
-  // young stepper
-  const handleNavigate = (direction) => {
-    const newIndex = currentIndex + direction;
+    if (!photos || photos.length === 0) {
+        return (
+            <Box p={2}>
+                <Button component={RouterLink} to={`/users/${userId}`} variant="text" sx={{ mb: 1 }}>
+                    Back to user
+                </Button>
+                <Typography variant="body1">No photos to display.</Typography>
+            </Box>
+        );
+    }
 
-    // prevent going out of bounds
-    if (newIndex < 0 || newIndex >= photos.length) return;
+    // Advanced mode
+    if (advanced) {
+        if (photoIndex === -1) {
+            return (
+                <Box p={2}>
+                    <Button component={RouterLink} to={`/users/${userId}`} variant="text">
+                        Back to user
+                    </Button>
+                    <Typography variant="body1">Photo not found.</Typography>
+                </Box>
+            );
+        }
 
-    const nextPhoto = photos[newIndex];
-    navigate(`/photos/${userId}/${nextPhoto._id}`, { replace: false });
-  };
+        const currentPhoto = photos[photoIndex];
+        return (
+            <PhotoViewer
+                photo={currentPhoto}
+                currentIndex={photoIndex}
+                totalPhotos={photos.length}
+                userId={userId}
+                stepper={handleNavigate}
+            />
+        );
+    }
 
-  if (isLoading) {
+    // Normal mode
     return (
-        <Box display="flex" alignItems="center" justifyContent="center" p={2}>
-          <Stack direction="row" spacing={2} alignItems="center">
-            <CircularProgress size={20} />
-            <Typography variant="body2">Loading photos…</Typography>
-          </Stack>
-        </Box>
+        <Stack spacing={2} sx={{ p: 1 }}>
+            <Button component={RouterLink} to={`/users/${userId}`} variant="text">
+                Back to user
+            </Button>
+
+            {photos.map((photo) => (
+                <PhotoCard key={photo._id} photo={photo} />
+            ))}
+        </Stack>
     );
-  }
-
-  if (error) {
-    return (
-        <Box p={2}>
-          <Typography color="error" variant="body2">Error: {error.message}</Typography>
-        </Box>
-    );
-  }
-
-  if (!photos || photos.length === 0) {
-    return (
-        <Box p={2}>
-          <Button component={RouterLink} to={`/users/${userId}`} variant="text" sx={{ mb: 1 }}>
-            Back to user
-          </Button>
-          <Typography variant="body1">No photos to display.</Typography>
-        </Box>
-    );
-  }
-
-  // advanced mode
-  if (advanced) {
-    const currentPhoto = photos[currentIndex];
-    return (
-        <PhotoViewer
-            photo={currentPhoto}
-            currentIndex={currentIndex}
-            totalPhotos={photos.length}
-            userId={userId}
-            photoNotFound={photoNotFound}
-            stepper={handleNavigate}
-        />
-    );
-  }
-
-  // normal mode
-  return (
-      <Stack spacing={2} sx={{ p: 1 }}>
-        <Button component={RouterLink} to={`/users/${userId}`} variant="text">
-          Back to user
-        </Button>
-
-        {photos.map((photo) => (
-            <PhotoCard key={photo._id} photo={photo} />
-        ))}
-      </Stack>
-  );
 }
 
 export default UserPhotos;
