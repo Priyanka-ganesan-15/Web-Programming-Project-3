@@ -1,5 +1,5 @@
 // UserList.jsx
-import React, { useEffect } from "react";
+import React from "react";
 import {
     List,
     Typography,

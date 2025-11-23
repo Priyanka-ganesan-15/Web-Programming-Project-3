@@ -1,7 +1,7 @@
 // CommentItem.jsx
 import React from "react";
-import { Box, Typography } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import {Box, Typography} from "@mui/material";
+import {useNavigate} from "react-router-dom";
 
 const MAX_COMMENT_LENGTH = 120;
 
@@ -27,14 +27,15 @@ function getRelativeDate(dateString) {
     return date.toLocaleDateString();
 }
 
-function CommentItem({ comment }) {
+function CommentItem({comment}) {
     const navigate = useNavigate();
     const text = comment.comment || "";
     const isLong = text.length > MAX_COMMENT_LENGTH;
     const displayText = truncateText(text, MAX_COMMENT_LENGTH);
 
-    const goToPhoto = () =>
+    const goToPhoto = () => {
         navigate(`/photos/${comment.photo_owner_id}/${comment.photo_id}`);
+    };
 
     return (
         <Box
@@ -82,10 +83,10 @@ function CommentItem({ comment }) {
                 }}
             />
 
-            <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Box sx={{flex: 1, minWidth: 0}}>
                 <Typography
                     variant="body2"
-                    sx={{ mb: 0.5, fontWeight: 500 }}
+                    sx={{mb: 0.5, fontWeight: 500}}
                     title={isLong ? text : undefined}
                 >
                     {displayText}

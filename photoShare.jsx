@@ -3,6 +3,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import {Grid, Paper} from "@mui/material";
 import {BrowserRouter, Route, Routes, useParams} from "react-router-dom";
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 
 import "./styles/main.css";
 import TopBar from "./components/TopBar";
@@ -11,13 +12,13 @@ import UserList from "./components/UserList";
 import UserPhotos from "./components/UserPhotos";
 import UserComments from "./components/UserComments";
 import {FeatureFlagsProvider} from "./src/context/FeatureFlagsContext";
-import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+
 
 const queryClient = new QueryClient();
 
 function UserCommentsRoute(){
     const {userId} = useParams();
-    return <UserComments userId={userId}/>
+    return <UserComments userId={userId}/>;
 }
 
 function UserDetailRoute() {

@@ -33,7 +33,7 @@ export const fetchUserDetails = (userId) => {
             return res.data;
         },
     });
-}
+};
 
 export const fetchUserComments = (userId) => {
     return useQuery({
@@ -43,7 +43,7 @@ export const fetchUserComments = (userId) => {
             return res.data;
         },
     });
-}
+};
 
 export const getPhotos = (userId) => {
     return useQuery({
@@ -53,12 +53,12 @@ export const getPhotos = (userId) => {
             return res.data;
         },
     });
-}
+};
 
 //used in top bar for some reason, best not to question the methodology...
 export const fetchRoot = async () => {
-    return await axios.get('/');
-}
+    return axios.get('/');
+};
 
 
 export default api;
