@@ -1,14 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import axios from 'axios';
 import { AppBar, Toolbar, Typography, Box } from '@mui/material';
 
 import './styles.css';
 import { useFeatureFlags } from '../../src/context/FeatureFlagsContext';
-
-// Toggle this to true to hit the running Express server on localhost:3001
-const USE_SERVER = false;
-const BASE = USE_SERVER ? 'http://localhost:3001' : '';
+import {fetchRoot} from "../../api.js";
 
 /**
  * Parse the pathname and determine the view kind and userId (if any).
@@ -44,15 +40,15 @@ function TopBar() {
   const [userName, setUserName] = useState(null);
   const [loading, setLoading] = useState(false);
 
+
+  // i guess im going to just sit on this for a while
   useEffect(() => {
     let mounted = true;
 
-    // Only fetch user when viewing detail or photos and a userId exists
     if ((kind === 'detail' || kind === 'photos') && userId) {
       setLoading(true);
-      const url = `${BASE}/user/${userId}`;
 
-      axios.get(url)
+      fetchRoot() // TODO does this actually serve a purpose?
         .then((response) => {
           if (!mounted) return;
           const data = response.data || null;
@@ -64,7 +60,7 @@ function TopBar() {
         })
         .catch((err) => {
           // eslint-disable-next-line no-console
-          console.error(`TopBar: failed to fetch user ${userId} from ${url}:`, err);
+          console.error(err);
           if (mounted) setUserName('User');
         })
         .finally(() => {
