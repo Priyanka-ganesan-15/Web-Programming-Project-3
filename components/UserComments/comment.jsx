@@ -1,9 +1,11 @@
 // CommentItem.jsx
 import React from "react";
 import { Box, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const MAX_COMMENT_LENGTH = 120;
 
+//i dont know why we are doing this but ok...
 function truncateText(text, maxLength) {
     if (text.length <= maxLength) return text;
     return `${text.substring(0, maxLength)}...`;
@@ -25,7 +27,8 @@ function getRelativeDate(dateString) {
     return date.toLocaleDateString();
 }
 
-function Comment({ comment, navigate }) {
+function CommentItem({ comment }) {
+    const navigate = useNavigate();
     const text = comment.comment || "";
     const isLong = text.length > MAX_COMMENT_LENGTH;
     const displayText = truncateText(text, MAX_COMMENT_LENGTH);
@@ -63,7 +66,6 @@ function Comment({ comment, navigate }) {
                 },
             }}
         >
-            {/* Thumbnail */}
             <Box
                 component="img"
                 src={`/images/${comment.photo_file_name}`}
@@ -80,7 +82,6 @@ function Comment({ comment, navigate }) {
                 }}
             />
 
-            {/* Content */}
             <Box sx={{ flex: 1, minWidth: 0 }}>
                 <Typography
                     variant="body2"
@@ -97,4 +98,5 @@ function Comment({ comment, navigate }) {
         </Box>
     );
 }
-export default Comment;
+
+export default CommentItem;

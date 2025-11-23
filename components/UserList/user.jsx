@@ -1,79 +1,56 @@
 import React from "react";
-import {Box, Divider, ListItemButton, ListItemText, Skeleton} from "@mui/material";
-import {Link, NavLink} from "react-router-dom";
+import { Box, Divider, ListItemButton, ListItemText, Skeleton } from "@mui/material";
+import { Link, useNavigate } from "react-router-dom";
+import { fetchUserStats } from "../../api";
 
-//i copied this in from that other file just to clean stuff up
-function User({user, stats, advanced, loadingStats}) {
+function User({ user, advanced }) {
+    const { data: userStats, isLoading: isLoadingStats } = fetchUserStats(user._id);
+    const navigate = useNavigate();
 
-    const userStats = stats.get(user._id);
-    const isLoadingThisUserStats = advanced && loadingStats && !userStats;
     return (
         <>
-            <ListItemButton // TODO a cannot be child of a
+            <ListItemButton
                 component={Link}
                 to={`/users/${user._id}`}
-                sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}
+                sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
             >
-                <ListItemText primary={`${user.first_name} ${user.last_name}`}/>
+                <ListItemText primary={`${user.first_name} ${user.last_name}`} />
 
                 {advanced && (
-                    <Box sx={{display: 'flex', gap: 0.5, ml: 1}}>
-                        {isLoadingThisUserStats ? (
-                            // Loading skeleton for stats
+                    <Box sx={{ display: 'flex', gap: 0.5, ml: 1 }}>
+                        {isLoadingStats ? (
                             <>
-                                <Skeleton variant="circular" width={24} height={24}/>
-                                <Skeleton variant="circular" width={24} height={24}/>
+                                <Skeleton variant="circular" width={24} height={24} />
+                                <Skeleton variant="circular" width={24} height={24} />
                             </>
                         ) : userStats ? (
                             <>
-                                {/* Photo count badge - green, read-only status */}
-                                <div
-                                    style={{
-                                        display: "inline-block",
-                                        minWidth: "18px",
-                                        padding: "2px 6px",
-                                        borderRadius: "999px",
-                                        fontSize: "12px",
-                                        textAlign: "center",
-                                        fontWeight: "bold",
-                                        border: "none",
-                                        outline: "none",
-                                        background: "#e6f6e6",
-                                        color: "#157f3b",
-                                    }}
+                                <span
+                                    className="bubble green"
+                                    role="status"
+                                    aria-label={`${userStats.photoCount} photo${userStats.photoCount !== 1 ? 's' : ''}`}
                                 >
                                     {userStats.photoCount}
-                                </div>
+                                </span>
 
-                                {/* Comment count badge - red, clickable button */}
-                                <NavLink
-                                    style={{
-                                        display: "inline-block",
-                                        minWidth: "18px",
-                                        padding: "2px 6px",
-                                        borderRadius: "999px",
-                                        fontSize: "12px",
-                                        textAlign: "center",
-                                        fontWeight: "bold",
-                                        border: "none",
-                                        outline: "none",
-                                        background: "#ffe6e6",
-                                        color: "#b42318",
-                                        cursor: "pointer",
-                                        transition: "background-color 0.2s ease, outline 0.2s ease",
-                                        textDecoration: "none", // optional: ensure NavLink doesn't underline
+                                <button
+                                    className="bubble red"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        navigate(`/users/${user._id}/comments`);
                                     }}
-                                    to={`/users/${user._id}/comments`}
+                                    aria-label={`View ${userStats.commentCount} comment${userStats.commentCount !== 1 ? 's' : ''} by ${user.first_name} ${user.last_name}`}
+                                    type="button"
                                 >
                                     {userStats.commentCount}
-                                </NavLink>
-
+                                </button>
                             </>
                         ) : null}
                     </Box>
                 )}
             </ListItemButton>
-            <Divider/>
+            <Divider />
         </>
     );
 }

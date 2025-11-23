@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {Link as RouterLink} from 'react-router-dom';
+import React from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 import {
     Card,
     CardContent,
@@ -9,41 +9,17 @@ import {
     CircularProgress,
     Box,
 } from '@mui/material';
-import {fetchUserDetails} from "../../api";
-
+import { fetchUserDetails } from "../../api";
 import './styles.css';
 
-function UserDetail({userId}) {
+function UserDetail({ userId }) {
+    const { data: user, isLoading, error } = fetchUserDetails(userId);
 
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    useEffect(() => {
-        setLoading(true);
-        setError(null);
-
-        fetchUserDetails(userId)
-            .then((response) => {
-                // Expecting the API to return a user object or null
-                console.log(response);
-
-                setUser(response || null);
-            })
-            .catch((err) => {
-                console.error(`Failed to fetch user ${userId} `, err);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
-
-    }, [userId]);
-
-    if (loading) {
+    if (isLoading) {
         return (
             <Box display="flex" alignItems="center" justifyContent="center" p={2}>
                 <Stack direction="row" spacing={2} alignItems="center">
-                    <CircularProgress size={20}/>
+                    <CircularProgress size={20} />
                     <Typography variant="body2">Loading user…</Typography>
                 </Stack>
             </Box>
@@ -53,7 +29,7 @@ function UserDetail({userId}) {
     if (error) {
         return (
             <Box p={2}>
-                <Typography color="error" variant="body2">{}</Typography>
+                <Typography color="error" variant="body2">Error: {error.message}</Typography>
             </Box>
         );
     }
@@ -62,7 +38,7 @@ function UserDetail({userId}) {
         return (
             <Box p={2}>
                 <Typography variant="body1">User not found.</Typography>
-                <Button component={RouterLink} to="/users" sx={{mt: 1}}>
+                <Button component={RouterLink} to="/users" sx={{ mt: 1 }}>
                     Back to users
                 </Button>
             </Box>
@@ -72,7 +48,7 @@ function UserDetail({userId}) {
     const fullName = `${user.first_name} ${user.last_name}`;
 
     return (
-        <Card sx={{p: 1}}>
+        <Card sx={{ p: 1 }}>
             <CardContent>
                 <Stack spacing={2}>
                     <Typography variant="h5">{fullName}</Typography>
@@ -84,7 +60,7 @@ function UserDetail({userId}) {
                     </Typography>
                     <Typography variant="body1">{user.description}</Typography>
 
-                    <Stack direction="row" spacing={1} sx={{mt: 1}}>
+                    <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
                         <Button
                             variant="contained"
                             component={RouterLink}

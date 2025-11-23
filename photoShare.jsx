@@ -23,7 +23,6 @@ function UserCommentsRoute(){
 function UserDetailRoute() {
     const {userId} = useParams();
     // eslint-disable-next-line no-console
-    console.log("UserDetailRoute: userId is:", userId);
     return <UserDetail userId={userId}/>;
 }
 
