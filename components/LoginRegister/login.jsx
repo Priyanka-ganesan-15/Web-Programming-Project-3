@@ -8,7 +8,6 @@ function Login() {
     const navigate = useNavigate();
     const setLoggedInUser = appStore((s) => s.setLoggedInUser);
 
-    // Single object state for login
     const [loginObject, setLoginObject] = useState({
         login_name: '',
         password: ''
@@ -17,7 +16,6 @@ function Login() {
     const loginMutation = postLogin();
 
     const handleLogin = () => {
-        // Send login_name only for now if API only accepts that; can update later for password
         loginMutation.mutate(loginObject, {
             onSuccess: (user) => {
                 setLoggedInUser(user);

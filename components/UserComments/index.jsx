@@ -16,7 +16,7 @@ function UserComments() {
 
     useEffect(() => {
         setPage('Comments');
-    },[]);
+    }, []);
 
     if (!advanced) {
         return (

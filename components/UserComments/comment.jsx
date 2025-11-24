@@ -1,11 +1,9 @@
-// CommentItem.jsx
 import React from "react";
 import {Box, Typography} from "@mui/material";
 import {useNavigate} from "react-router-dom";
 
 const MAX_COMMENT_LENGTH = 120;
 
-//i dont know why we are doing this but ok...
 function truncateText(text, maxLength) {
     if (text.length <= maxLength) return text;
     return `${text.substring(0, maxLength)}...`;

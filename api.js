@@ -1,6 +1,8 @@
 import axios from "axios";
 import {useMutation, useQuery} from '@tanstack/react-query';
 
+//api relays from problem 1
+
 const api = axios.create({
     baseURL: "http://localhost:3001",
 });

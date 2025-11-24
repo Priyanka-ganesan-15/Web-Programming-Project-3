@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { useParams, Link as RouterLink, useNavigate } from 'react-router-dom';
+import React, {useEffect} from 'react';
+import {useParams, Link as RouterLink, useNavigate} from 'react-router-dom';
 import {
     Typography,
     Stack,
@@ -7,15 +7,13 @@ import {
     Button,
     CircularProgress,
 } from '@mui/material';
-
-import './styles.css';
-import { getPhotos } from "../../api.js";
+import {getPhotos} from "../../api.js";
 import PhotoCard from './photoCard';
 import PhotoViewer from './photoViewer';
 import appStore from "../../src/context/appStore.js";
 
 function UserPhotos() {
-    const { userId, photoId } = useParams();
+    const {userId, photoId} = useParams();
     const navigate = useNavigate();
 
     const advanced = appStore((s) => s.advanced);
@@ -23,12 +21,12 @@ function UserPhotos() {
     const photoIndex = appStore((s) => s.photoIndex);
     const setPhotoIndex = appStore((s) => s.setPhotoIndex);
 
-    const { data: photos = [], isLoading, error } = getPhotos(userId);
+    const {data: photos = [], isLoading, error} = getPhotos(userId);
 
     // Handle advanced mode: navigate to first photo if needed
     useEffect(() => {
         if (advanced && photos.length > 0 && !photoId) {
-            navigate(`/photos/${userId}/${photos[0]._id}`, { replace: true });
+            navigate(`/photos/${userId}/${photos[0]._id}`, {replace: true});
         }
     }, [advanced, photos, photoId, userId, navigate]);
 
@@ -49,14 +47,14 @@ function UserPhotos() {
         if (newIndex < 0 || newIndex >= photos.length) return;
 
         const nextPhoto = photos[newIndex];
-        navigate(`/photos/${userId}/${nextPhoto._id}`, { replace: false });
+        navigate(`/photos/${userId}/${nextPhoto._id}`, {replace: false});
     };
 
     if (isLoading) {
         return (
             <Box display="flex" alignItems="center" justifyContent="center" p={2}>
                 <Stack direction="row" spacing={2} alignItems="center">
-                    <CircularProgress size={20} />
+                    <CircularProgress size={20}/>
                     <Typography variant="body2">Loading photos…</Typography>
                 </Stack>
             </Box>
@@ -74,7 +72,7 @@ function UserPhotos() {
     if (!photos || photos.length === 0) {
         return (
             <Box p={2}>
-                <Button component={RouterLink} to={`/users/${userId}`} variant="text" sx={{ mb: 1 }}>
+                <Button component={RouterLink} to={`/users/${userId}`} variant="text" sx={{mb: 1}}>
                     Back to user
                 </Button>
                 <Typography variant="body1">No photos to display.</Typography>
@@ -109,13 +107,13 @@ function UserPhotos() {
 
     // Normal mode
     return (
-        <Stack spacing={2} sx={{ p: 1 }}>
+        <Stack spacing={2} sx={{p: 1}}>
             <Button component={RouterLink} to={`/users/${userId}`} variant="text">
                 Back to user
             </Button>
 
             {photos.map((photo) => (
-                <PhotoCard key={photo._id} photo={photo} />
+                <PhotoCard key={photo._id} photo={photo}/>
             ))}
         </Stack>
     );

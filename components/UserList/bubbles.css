@@ -1,38 +1,38 @@
 .bubble {
-  display: inline-block;
-  min-width: 18px;
-  padding: 2px 6px;
-  border-radius: 999px;
-  font-size: 12px;
-  text-align: center;
-  font-weight: bold;
-  border: none;
-  outline: none;
+    display: inline-block;
+    min-width: 18px;
+    padding: 2px 6px;
+    border-radius: 999px;
+    font-size: 12px;
+    text-align: center;
+    font-weight: bold;
+    border: none;
+    outline: none;
 }
 
 .bubble.green {
-  background: #e6f6e6;
-  color: #157f3b;
+    background: #e6f6e6;
+    color: #157f3b;
 }
 
 .bubble.green:focus-visible {
-  outline: 2px solid #157f3b;
-  outline-offset: 2px;
+    outline: 2px solid #157f3b;
+    outline-offset: 2px;
 }
 
 .bubble.red {
-  background: #ffe6e6;
-  color: #b42318;
-  cursor: pointer;
-  transition: background-color 0.2s ease, outline 0.2s ease;
+    background: #ffe6e6;
+    color: #b42318;
+    cursor: pointer;
+    transition: background-color 0.2s ease, outline 0.2s ease;
 }
 
 .bubble.red:hover {
-  background: #ffcccc;
+    background: #ffcccc;
 }
 
 .bubble.red:focus-visible {
-  outline: 2px solid #b42318;
-  outline-offset: 2px;
-  background: #ffcccc;
+    outline: 2px solid #b42318;
+    outline-offset: 2px;
+    background: #ffcccc;
 }

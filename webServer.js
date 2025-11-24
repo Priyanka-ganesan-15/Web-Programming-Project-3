@@ -82,6 +82,8 @@ const requireLogin = (req, res, next) => {
  *              This is good for testing connectivity with MongoDB.
  */
 
+//im too lazy to decompose this properly sorry
+
 app.get("/test/info", async (req, res) => {
     try {
         const info = await SchemaInfo.findOne({}, {__v: 0}).lean();
@@ -298,7 +300,6 @@ app.post("/admin/login", async (req, res) => {
             return res.status(400).json({error: "Invalid password"});
         }
 
-        //create session later
         req.session.loggedInUser = {
             _id: user._id,
             first_name: user.first_name,
@@ -306,7 +307,6 @@ app.post("/admin/login", async (req, res) => {
             login_name: user.login_name,
         };
 
-        //return user info
         return res.status(200).json(req.session.loggedInUser);
     } catch (err) {
         console.error(err);
@@ -382,7 +382,7 @@ app.post("/photos/new", requireLogin, (req, res) => {
             });
 
             await newPhoto.save();
-            return res.status(200).json({message: "Photo uploaded!", photo: newPhoto});
+            return res.status(200).json({message: "Photo uploaded", photo: newPhoto});
         });
     });
 });

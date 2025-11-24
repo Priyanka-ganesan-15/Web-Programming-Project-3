@@ -1,18 +1,18 @@
 import React from 'react';
-import { Link as RouterLink } from 'react-router-dom';
-import { Box, Stack, Avatar, Typography, Link } from '@mui/material';
-import { formatDate, initials } from './photoHelpers';
+import {Link as RouterLink} from 'react-router-dom';
+import {Box, Stack, Avatar, Typography, Link} from '@mui/material';
+import {formatDate, initials} from './photoHelpers';
 
-function PhotoComments({ comments }) {
+function PhotoComments({comments}) {
     if (!comments || comments.length === 0) {
         return <Typography variant="body2">No comments yet.</Typography>;
     }
 
     return (
-        <Stack spacing={2} sx={{ mt: 1 }}>
+        <Stack spacing={2} sx={{mt: 1}}>
             {comments.map((comment) => (
-                <Box key={comment._id} sx={{ display: 'flex', gap: 1 }}>
-                    <Avatar sx={{ width: 36, height: 36, fontSize: 12 }}>
+                <Box key={comment._id} sx={{display: 'flex', gap: 1}}>
+                    <Avatar sx={{width: 36, height: 36, fontSize: 12}}>
                         {initials(comment.user)}
                     </Avatar>
                     <Box>

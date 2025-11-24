@@ -14,7 +14,7 @@ function TopBar() {
     const logoutMutation = postLogout();
     const logoutUser = appStore((s) => s.logoutUser);
 
-    //this. was throwing error
+    //this.whatever was throwing error
     const fileInputRef = useRef(null);
     const queryClient = useQueryClient();
     const uploadMutation = postPhoto();
@@ -93,7 +93,7 @@ function TopBar() {
                 </label>
 
                 <Box>
-                    <Typography variant="subtitle1">{page}</Typography> {/* Right-hand title */}
+                    <Typography variant="subtitle1">{page}</Typography>
                 </Box>
             </Toolbar>
         </AppBar>

@@ -1,4 +1,3 @@
-
 export const formatDate = (dateStr) => {
     try {
         const d = new Date(dateStr);
