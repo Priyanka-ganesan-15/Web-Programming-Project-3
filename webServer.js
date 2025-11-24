@@ -281,17 +281,22 @@ app.get("/commentsOfUser/:id", requireLogin, async (req, res) => {
 
 app.post("/admin/login", async (req, res) => {
     try {
-
-        const {login_name} = req.body;
+        const {login_name, password} = req.body;
 
         if (!login_name) {
             return res.status(400).json({error: "Missing login_name"});
+        }
+        if (!password) {
+            return res.status(400).json({error: "Missing password"});
         }
 
         const user = await User.findOne({login_name: login_name}).select("-__v");
 
         if (!user) {
             return res.status(400).json({error: "User not found"});
+        }
+        if (user.password !== password) {
+            return res.status(400).json({error: "Invalid password"});
         }
 
         //create session later
@@ -383,6 +388,57 @@ app.post("/photos/new", requireLogin, (req, res) => {
     });
 });
 
+//register
+app.post('/user', async (req, res) => {
+    try {
+        const {
+            login_name,
+            password,
+            password_confirmation,
+            first_name,
+            last_name,
+            location,
+            description,
+            occupation
+        } = req.body;
+
+        if (password !== password_confirmation) res.status(400).json({error: "Please match passwords"});
+
+        if (
+            !login_name?.trim() ||
+            !password?.trim() ||
+            !first_name?.trim() ||
+            !last_name?.trim() ||
+            !location?.trim() ||
+            !description?.trim() ||
+            !occupation?.trim()
+        ) {
+            return res.status(400).json({error: "All fields are required."});
+        }
+
+        const existingUser = await User.findOne({login_name});
+        if (existingUser) return res.status(400).json({error: "Login name in use"});
+
+        const newUser = new User({
+            login_name,
+            password,
+            first_name,
+            last_name,
+            location,
+            description,
+            occupation
+        });
+
+        await newUser.save();
+
+        console.log(newUser.toObject());
+
+        return res.status(200).json(newUser.toObject());
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({error: "Server error."});
+    }
+});
 
 const server = app.listen(portno, function () {
     const port = server.address().port;
