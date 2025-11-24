@@ -61,7 +61,7 @@ export const postLogin = () => {
         mutationFn: async (loginName) => {
             console.log(loginName);
             const res = await api.post('/admin/login', {login_name: loginName}, {withCredentials: true});
-            return res.data; // expected: user object
+            return res.data;
         },
     });
 };
@@ -70,7 +70,7 @@ export const postLogout = () => {
     return useMutation({
         mutationFn: async () => {
             const res = await api.post('/admin/logout', {}, {withCredentials: true});
-            return res.data; // expected: user object
+            return res.data;
         },
     });
 };
@@ -81,6 +81,15 @@ export const postComment = () => {
             const res = await api.post(`/commentsOfPhoto/${photoId}`, {comment: commentContent}, {withCredentials: true});
             return res.data;
         },
+    });
+};
+
+export const postPhoto = () => {
+    return useMutation({
+        mutationFn: async (domForm) => {
+            const res = await api.post('photos/new', domForm, {withCredentials: true});
+            return res.data;
+        }
     });
 };
 

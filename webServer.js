@@ -11,6 +11,8 @@ import bluebird from "bluebird";
 import express from "express";
 import {fileURLToPath} from 'url';
 import {dirname} from 'path';
+import multer from "multer";
+import fs from "fs";
 
 // ToDO - Your submission should work without this line. Comment out or delete this line for tests and before submission!
 // import models from "./project2/modelData/photoApp.js";
@@ -21,6 +23,7 @@ import User from "./schema/user.js";
 import Photo from "./schema/photo.js";
 import SchemaInfo from "./schema/schemaInfo.js";
 
+//config stuff
 const portno = 3001; // Port number to use
 const app = express();
 app.use(express.json()); //needed to parse bodies ig
@@ -29,6 +32,8 @@ app.use(session({ // from slides
     resave: false,
     saveUninitialized: true,
 }));
+const processFormBody = multer({storage: multer.memoryStorage()}).single('uploadedphoto');
+
 
 // Enable CORS for all routes
 app.use((req, res, next) => {
@@ -347,6 +352,37 @@ app.post('/commentsOfPhoto/:photo_id', requireLogin, async (req, res) => {
         return res.status(500).json({error: "Server error"});
     }
 });
+
+app.post("/photos/new", requireLogin, (req, res) => {
+    processFormBody(req, res, function (err) {
+        if (err || !req.file) {
+            return res.status(400).json({error: "No file uploaded"});
+        }
+
+        // We need to create the file in the directory "images" under an unique name.
+        // We make the original file name unique by adding a unique prefix with a
+        // timestamp.
+        const timestamp = new Date().valueOf();
+        const filename = 'U' + String(timestamp) + req.file.originalname;
+
+        return fs.writeFile(`./images/${filename}`, req.file.buffer, async (e) => {
+            if (e) {
+                console.error(e);
+                return res.status(500).json({error: "Failed to save file"});
+            }
+
+            const newPhoto = new Photo({
+                file_name: filename,
+                user_id: req.session.loggedInUser._id,
+                comments: []
+            });
+
+            await newPhoto.save();
+            return res.status(200).json({message: "Photo uploaded!", photo: newPhoto});
+        });
+    });
+});
+
 
 const server = app.listen(portno, function () {
     const port = server.address().port;
