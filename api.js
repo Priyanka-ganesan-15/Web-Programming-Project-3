@@ -58,9 +58,17 @@ export const getPhotos = (userId) => {
 
 export const postLogin = () => {
     return useMutation({
-        mutationFn: async (loginName) => {
-            console.log(loginName);
-            const res = await api.post('/admin/login', {login_name: loginName}, {withCredentials: true});
+        mutationFn: async (loginObject) => {
+            const res = await api.post('/admin/login', loginObject, {withCredentials: true});
+            return res.data;
+        },
+    });
+};
+
+export const postRegister = () => {
+    return useMutation({
+        mutationFn: async (userObject) => {
+            const res = await api.post('/user', userObject, {withCredentials: true});
             return res.data;
         },
     });
@@ -92,6 +100,3 @@ export const postPhoto = () => {
         }
     });
 };
-
-
-export default api;
